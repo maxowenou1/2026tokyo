@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Tokyo OS v11</title>
+    <title>Tokyo Travel OS</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#F9F9F7">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,22 +13,22 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round|Material+Icons+Outlined" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Lato:wght@400;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Lato:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --bg: #F9F9F7;
-            --card: #FFFFFF;
+            --card-bg: #FFFFFF;
             --text-main: #1A1A1A;
             --text-sub: #666666;
-            --accent: #C5A059; 
+            --accent: #C5A059;
             --red: #D9534F;
             --shadow: 0 4px 20px rgba(0,0,0,0.06);
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
         body {
-            background-color: #EFEFEF;
+            background-color: #E0E0E0;
             margin: 0; padding: 0;
             font-family: 'Lato', 'Noto Serif TC', sans-serif;
             color: var(--text-main);
@@ -42,106 +42,112 @@
             width: 100%; max-width: 430px;
             background-color: var(--bg);
             min-height: 100vh; position: relative;
-            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
             padding-bottom: calc(90px + var(--safe-bottom));
             overflow-x: hidden;
         }
 
-        /* --- Header & Weather --- */
         header {
             padding: max(20px, env(safe-area-inset-top)) 20px 10px;
             background: var(--bg); position: sticky; top: 0; z-index: 50;
-            text-align: center;
+            text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03);
         }
-        .trip-title { font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
-        .trip-year { font-size: 0.75rem; border: 1px solid #ccc; border-radius: 20px; padding: 2px 8px; display: inline-block; color: #888; }
+        .trip-title { font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; }
+        .trip-date { font-size: 0.8rem; color: #888; font-family: 'Inter'; letter-spacing: 1px; margin-top: 5px; }
 
-        /* 天氣模組 */
         .weather-widget {
             display: flex; gap: 15px; overflow-x: auto; padding: 10px 20px;
-            scrollbar-width: none; background: linear-gradient(to bottom, #f9f9f7, #f0f0f0);
-            border-bottom: 1px solid #e0e0e0;
+            scrollbar-width: none; background: #fff; margin-bottom: 10px;
         }
         .weather-widget::-webkit-scrollbar { display: none; }
         .w-item { text-align: center; min-width: 50px; }
         .w-time { font-size: 0.7rem; color: #999; }
-        .w-icon { font-size: 1.5rem; margin: 2px 0; }
+        .w-icon { font-size: 1.4rem; margin: 2px 0; }
         .w-temp { font-size: 0.9rem; font-weight: 700; font-family: 'Inter'; }
 
-        /* --- 行程表 (Day Scroll) --- */
         .date-scroll {
-            display: flex; gap: 10px; overflow-x: auto; padding: 10px 20px;
-            scrollbar-width: none;
+            display: flex; gap: 12px; overflow-x: auto; padding: 10px 20px;
+            scrollbar-width: none; position: sticky; top: 85px; z-index: 49; background: var(--bg);
         }
         .date-scroll::-webkit-scrollbar { display: none; }
         .date-item {
-            min-width: 50px; height: 65px; background: #fff; border-radius: 30px;
+            min-width: 50px; height: 70px; background: #fff; border-radius: 35px;
             border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: var(--shadow); transition: 0.2s; cursor: pointer;
         }
-        .date-item.active { background: var(--text-main); color: #fff; transform: translateY(-3px); }
+        .date-item.active { background: var(--text-main); color: #fff; transform: translateY(-3px); border-color: var(--text-main); }
         .date-day { font-size: 0.6rem; letter-spacing: 1px; margin-bottom: 2px; }
-        .date-num { font-size: 1.2rem; font-weight: 700; font-family: 'Inter'; }
+        .date-num { font-size: 1.3rem; font-weight: 700; font-family: 'Inter'; }
 
-        .timeline-box { padding: 20px; }
+        .timeline-box { padding: 20px; position: relative; }
         .card {
             background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px;
             box-shadow: var(--shadow); position: relative; border: 1px solid rgba(0,0,0,0.03);
             cursor: pointer; transition: 0.2s;
         }
-        .card-time { font-family: 'Inter'; font-weight: 600; font-size: 1.1rem; color: var(--accent); margin-bottom: 5px; }
-        .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
-        .card-sub { font-size: 0.8rem; color: #999; display: flex; align-items: center; gap: 4px;}
+        .card:active { transform: scale(0.98); }
+        .card-time { font-family: 'Inter'; font-weight: 600; font-size: 1.2rem; color: var(--accent); margin-bottom: 5px; }
+        .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; line-height: 1.4; }
+        .card-sub { font-size: 0.85rem; color: #888; display: flex; align-items: center; gap: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* --- 憑證卡片 (獨立區) --- */
         .booking-list { padding: 20px; }
-        .booking-card {
+        .bk-card {
             background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 20px;
             box-shadow: var(--shadow); border: 1px solid #eee; position: relative;
         }
-        .bk-header { padding: 12px 15px; background: #F8F8F8; border-bottom: 1px dashed #ddd; display: flex; justify-content: space-between; align-items: center; }
-        .bk-date { font-size: 0.8rem; font-weight: 700; color: #555; }
+        .bk-header { padding: 12px 15px; background: #FAFAFA; border-bottom: 1px dashed #ddd; display: flex; justify-content: space-between; color: #888; font-size: 0.8rem; font-weight: 700; }
         .bk-body { padding: 20px; }
-        .bk-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
-        .bk-code-row { margin-bottom: 15px; }
-        .bk-code-label { font-size: 0.7rem; color: #aaa; margin-bottom: 2px; display: block; }
-        .bk-code { font-size: 1.4rem; font-family: 'Inter'; font-weight: 700; letter-spacing: 1px; color: var(--text-main); }
+        .bk-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; }
+        .bk-code-label { font-size: 0.7rem; color: #aaa; letter-spacing: 1px; }
+        .bk-code { font-size: 1.6rem; font-family: 'Inter'; font-weight: 700; color: var(--text-main); letter-spacing: 1px; margin-top: 2px; }
         .bk-actions { padding: 12px 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
-        .bk-btn {
-            flex: 1; text-align: center; font-size: 0.8rem; padding: 8px; border-radius: 6px;
-            background: #f0f0f0; color: #333; text-decoration: none; font-weight: 600;
+        .btn-link { 
+            flex: 1; text-align: center; padding: 8px; border-radius: 6px; 
+            background: var(--text-main); color: #fff; text-decoration: none; font-size: 0.85rem; 
         }
-        .btn-del { width: 30px; display: flex; align-items: center; justify-content: center; color: #ffadad; cursor: pointer; }
+        .btn-del { width: 32px; display: flex; align-items: center; justify-content: center; color: #ffadad; cursor: pointer; }
 
-        /* --- AI 小精靈 (懸浮按鈕) --- */
-        .ai-fab {
-            position: fixed; bottom: 100px; right: 20px;
-            width: 50px; height: 50px; background: linear-gradient(135deg, #a18cd1, #fbc2eb);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 90;
-            border: 2px solid #fff;
+        .info-container { padding: 20px; }
+        .map-card {
+            height: 180px; background: #eee; border-radius: 12px; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; color: #999; margin-bottom: 20px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Map_of_Tokyo_Special_Wards_and_cities_and_villages.svg/1200px-Map_of_Tokyo_Special_Wards_and_cities_and_villages.svg.png');
+            background-size: cover; background-position: center;
         }
-        .ai-fab span { color: #fff; font-size: 24px; }
+        .map-btn {
+            position: absolute; bottom: 15px; left: 15px; right: 15px;
+            background: #fff; padding: 12px; text-align: center; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            color: var(--text-main); text-decoration: none; display: block;
+        }
+        .vjw-card {
+            background: linear-gradient(135deg, #1f1f1f, #3a3a3a); color: #fff;
+            padding: 25px; border-radius: 12px; position: relative; margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); cursor: pointer;
+        }
+        .vjw-tag { background: var(--red); font-size: 0.6rem; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; display: inline-block; }
+        .em-grid { display: flex; gap: 15px; margin-bottom: 20px; }
+        .em-box { flex: 1; background: #fff; padding: 20px; text-align: center; border-radius: 12px; box-shadow: var(--shadow); }
+        .em-num { font-size: 2.2rem; font-weight: 700; color: var(--red); font-family: 'Inter'; display: block; margin-top: 5px; }
+        .em-label { font-size: 0.7rem; color: #999; letter-spacing: 1px; }
+        .taxi-card {
+            background: #fff; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); border-left: 5px solid var(--text-main);
+        }
+        .taxi-jp { font-size: 1.4rem; font-weight: 700; font-family: 'Noto Serif TC'; margin: 10px 0; }
 
-        /* --- AI 聊天室 --- */
-        .ai-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 3000; display: none;
-            justify-content: center; align-items: flex-end;
+        .wallet-header { text-align: center; padding: 30px 20px; }
+        .wallet-total { font-size: 3rem; font-weight: 700; font-family: 'Inter'; }
+        
+        .filter-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .filter-btn {
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid #ddd;
+            background: #fff; color: #999; display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: 0.2s;
         }
-        .ai-overlay.show { display: flex; }
-        .ai-box {
-            width: 100%; max-width: 430px; height: 80vh; background: #fff;
-            border-radius: 20px 20px 0 0; display: flex; flex-direction: column; overflow: hidden;
-        }
-        .ai-header { padding: 15px; background: #f5f5f5; font-weight: 700; display: flex; justify-content: space-between; }
-        .ai-content { flex: 1; padding: 20px; overflow-y: auto; background: #fff; }
-        .msg { margin-bottom: 10px; padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 0.9rem; }
-        .msg.ai { background: #f0f0f0; align-self: flex-start; margin-right: auto; }
-        .msg.user { background: var(--text-main); color: #fff; align-self: flex-end; margin-left: auto; }
-        .ai-input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .filter-btn.active { background: var(--text-main); color: #fff; border-color: var(--text-main); }
+        
+        .exp-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #eee; }
 
-        /* --- 底部導航 & 新增按鈕 --- */
         .nav-bar {
             position: absolute; bottom: 0; left: 0; width: 100%;
             background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
@@ -151,9 +157,8 @@
         .nav-item { text-align: center; color: #ccc; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--text-main); }
         .nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
-        .nav-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; }
+        .nav-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; }
 
-        /* 中間新增按鈕 */
         .fab-main {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 60px; height: 60px; background: var(--text-main); border-radius: 50%;
@@ -162,10 +167,60 @@
             border: 4px solid #fff;
         }
 
-        /* --- 新增面板 (Sheet) --- */
+        .ai-fab {
+            position: fixed; bottom: 100px; right: 20px;
+            width: 52px; height: 52px; background: #6c5ce7; border-radius: 50%;
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); cursor: pointer; z-index: 90;
+            border: 2px solid #fff;
+        }
+
+        .ai-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000; display: none;
+            justify-content: center; align-items: flex-end;
+        }
+        .ai-overlay.show { display: flex; }
+        .ai-box {
+            width: 100%; max-width: 430px; height: 75vh; background: #fff;
+            border-radius: 20px 20px 0 0; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .ai-header { padding: 15px; background: #f9f9f9; font-weight: 700; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;}
+        .ai-content { flex: 1; padding: 20px; overflow-y: auto; background: #fff; }
+        .msg { margin-bottom: 10px; padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 0.95rem; line-height: 1.5; }
+        .msg.ai { background: #f0f0f0; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.user { background: var(--text-main); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; margin-left: auto; }
+        .ai-input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+
+        /* 詳情頁 */
+        .detail-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1500; display: none;
+            justify-content: center; align-items: flex-end;
+        }
+        .detail-modal.show { display: flex; }
+        .detail-sheet {
+            width: 100%; max-width: 430px; height: 85vh; background: #fff;
+            border-radius: 20px 20px 0 0; overflow-y: auto; position: relative;
+            animation: slideUp 0.3s;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .dt-cover { height: 180px; background: #eee; position: relative; cursor: pointer; }
+        .dt-close { 
+            position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; 
+            background: rgba(0,0,0,0.6); border-radius: 50%; color: #fff; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; z-index: 1600; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .dt-content { padding: 25px; }
+        .dt-label { font-size: 0.7rem; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+        .dt-title { font-size: 1.8rem; font-weight: 700; margin: 5px 0 10px; }
+        .dt-desc { font-size: 1rem; color: #444; line-height: 1.8; margin-top: 20px; border-left: 3px solid #eee; padding-left: 15px; }
+        .ask-btn { width: 100%; padding: 15px; background: #F0F4F8; color: #333; border: none; border-radius: 12px; font-weight: 700; margin-top: 30px; cursor: pointer; }
+
         .sheet-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.5); z-index: 1999; display: none; 
+            background: rgba(0,0,0,0.5); z-index: 2999; display: none; 
         }
         .sheet-overlay.show { display: block; }
         
@@ -175,20 +230,18 @@
             transform: translateY(100%); transition: 0.3s; 
             padding-bottom: calc(30px + var(--safe-bottom));
             position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; 
-            z-index: 2000;
+            z-index: 3000;
         }
         .sheet.show { transform: translateY(0); }
         
-        .inp { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 12px; font-size: 1rem; box-sizing: border-box; background: #f9f9f9; }
-        .type-row { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px;}
+        .type-row { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;}
         .type-btn { padding: 8px 16px; border: 1px solid #eee; border-radius: 20px; font-size: 0.9rem; white-space: nowrap; cursor: pointer; }
         .type-btn.active { background: var(--text-main); color: #fff; }
+        .inp { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 12px; font-size: 1rem; box-sizing: border-box; background: #f9f9f9; outline: none; }
         .btn-main { width: 100%; padding: 15px; background: var(--text-main); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; }
-
+        
         .view { display: none; }
         .view.active { display: block; }
-        
-        /* 隱藏/顯示控制 */
         .hidden { display: none; }
     </style>
 </head>
@@ -197,48 +250,68 @@
 <div id="app-container">
     
     <header>
-        <div class="trip-title">TOKYO TRIP <span class="trip-year">2026</span></div>
+        <div class="trip-title">TOKYO TRIP</div>
+        <div class="trip-date">2026.09.13 - 09.22</div>
     </header>
 
-    <div class="weather-widget" id="weather-box">
-        <div style="font-size:0.8rem; color:#999; padding:10px;">載入東京天氣...</div>
-    </div>
-
     <div id="view-trip" class="view active">
-        <div class="date-scroll" id="date-list">
-            </div>
-        <div class="timeline-box" id="itinerary-list">
-            </div>
+        <div class="weather-widget" id="weather-box">
+            <div style="font-size:0.8rem; padding:5px; color:#999;">載入天氣中...</div>
+        </div>
+        <div class="date-scroll" id="date-list"></div>
+        <div class="timeline-box" id="itinerary-list"></div>
     </div>
 
-    <div id="view-booking" class="view">
-        <div class="booking-list" id="booking-list">
-            </div>
+    <div id="view-ticket" class="view">
+        <div style="padding:20px; text-align:center; color:#999; font-size:0.8rem; letter-spacing:1px;">BOOKINGS & TICKETS</div>
+        <div class="booking-list" id="booking-list"></div>
     </div>
 
     <div id="view-info" class="view">
-        <div style="padding:20px; text-align:center;">
-            <div style="background:#333; color:#fff; padding:20px; border-radius:12px; margin-bottom:20px;" onclick="window.open('https://www.vjw.digital.go.jp/','_blank')">
-                <h3>Visit Japan Web</h3>
-                <p style="font-size:0.8rem; opacity:0.7;">入境審查 QR Code</p>
+        <div class="info-container">
+            <div class="map-card">
+                <a href="https://www.google.com/maps/place/Tokyo" target="_blank" class="map-btn">開啟 Google Maps 導航</a>
             </div>
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-                    <div style="color:#d9534f; font-size:2rem; font-weight:bold;">110</div>
-                    <div style="font-size:0.7rem; color:#999;">警察</div>
+            <div class="vjw-card" onclick="window.open('https://www.vjw.digital.go.jp/','_blank')">
+                <span class="vjw-tag">MUST HAVE</span>
+                <div style="font-size:1.4rem; font-weight:700;">Visit Japan Web</div>
+                <div style="font-size:0.8rem; opacity:0.7;">入境審查 & 海關申報 QR Code</div>
+                <span class="material-icons-outlined" style="position:absolute; right:20px; top:50%; transform:translateY(-50%); font-size:32px; opacity:0.5;">qr_code_2</span>
+            </div>
+            <div class="em-grid">
+                <div class="em-box">
+                    <span class="em-label">警察 (POLICE)</span>
+                    <span class="em-num">110</span>
                 </div>
-                <div style="flex:1; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-                    <div style="color:#d9534f; font-size:2rem; font-weight:bold;">119</div>
-                    <div style="font-size:0.7rem; color:#999;">救護</div>
+                <div class="em-box">
+                    <span class="em-label">救護/火警</span>
+                    <span class="em-num">119</span>
                 </div>
+            </div>
+            <div style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); margin-bottom:20px;">
+                <div style="font-weight:700;">訪日外國人醫療熱線</div>
+                <div style="font-size:1.6rem; font-weight:700; margin:5px 0;">050-3816-2787</div>
+                <div style="font-size:0.7rem; color:#999;">24小時對應 (英/中/韓)</div>
+            </div>
+            <div class="taxi-card">
+                <div style="font-size:0.8rem; color:#999;">給司機 (TO DRIVER)</div>
+                <div class="taxi-jp">ここへ行ってください。</div>
+                <div style="font-size:0.8rem; color:#999;">(請載我到這裡)</div>
             </div>
         </div>
     </div>
 
     <div id="view-wallet" class="view">
-        <div style="text-align:center; padding:30px;">
-            <div style="color:#888;">總支出 (TWD)</div>
-            <div style="font-size:2.5rem; font-weight:700;" id="wallet-total">$0</div>
+        <div class="wallet-header">
+            <div style="color:#999; font-size:0.8rem;">總支出 (TWD)</div>
+            <div class="wallet-total" id="wallet-total">$0</div>
+            <div class="filter-row" style="margin-top:15px;">
+                <div class="filter-btn active" onclick="filterWallet('ALL', this)">全</div>
+                <div class="filter-btn" onclick="filterWallet('Y', this)">Y</div>
+                <div class="filter-btn" onclick="filterWallet('O', this)">O</div>
+                <div class="filter-btn" onclick="filterWallet('E', this)">E</div>
+                <div class="filter-btn" onclick="filterWallet('S', this)">S</div>
+            </div>
         </div>
         <div id="wallet-list" style="padding:0 20px;"></div>
     </div>
@@ -250,14 +323,14 @@
     <div class="ai-overlay" id="ai-modal">
         <div class="ai-box">
             <div class="ai-header">
-                <span>東京 AI 導遊</span>
+                <span>AI 小精靈</span>
                 <span class="material-icons-round" onclick="toggleAI(false)">close</span>
             </div>
             <div class="ai-content" id="chat-history">
-                <div class="msg ai">嗨！想問天氣、交通還是訂位建議？</div>
+                <div class="msg ai">嗨！我是東京旅遊小幫手，我可以讀取你的行程和記帳，有什麼想問的嗎？</div>
             </div>
             <div class="ai-input-area">
-                <input type="text" id="ai-input" class="inp" style="margin:0;" placeholder="輸入問題...">
+                <input type="text" id="ai-input" class="inp" style="margin:0;" placeholder="試試問：我花了多少錢？">
                 <button class="btn-main" style="width:auto;" onclick="sendAI()">送出</button>
             </div>
         </div>
@@ -265,57 +338,76 @@
 
     <div class="nav-bar">
         <div class="nav-item active" onclick="switchView('view-trip', this)">
-            <span class="material-icons-round nav-icon">map</span>
-            <span class="nav-label">行程</span>
+            <span class="material-icons-round nav-icon">map</span><span class="nav-label">行程</span>
         </div>
-        <div class="nav-item" onclick="switchView('view-booking', this)">
-            <span class="material-icons-round nav-icon">confirmation_number</span>
-            <span class="nav-label">憑證</span>
+        <div class="nav-item" onclick="switchView('view-ticket', this)">
+            <span class="material-icons-round nav-icon">confirmation_number</span><span class="nav-label">憑證</span>
         </div>
-        <div style="width:60px;"></div> <div class="nav-item" onclick="switchView('view-info', this)">
-            <span class="material-icons-round nav-icon">info</span>
-            <span class="nav-label">資訊</span>
+        <div style="width:60px;"></div>
+        <div class="nav-item" onclick="switchView('view-info', this)">
+            <span class="material-icons-round nav-icon">info</span><span class="nav-label">資訊</span>
         </div>
         <div class="nav-item" onclick="switchView('view-wallet', this)">
-            <span class="material-icons-round nav-icon">account_balance_wallet</span>
-            <span class="nav-label">記帳</span>
+            <span class="material-icons-round nav-icon">account_balance_wallet</span><span class="nav-label">記帳</span>
         </div>
     </div>
 
-    <div class="fab-main" onclick="openSheet()">
-        <span class="material-icons-round" style="font-size:32px;">add</span>
-    </div>
+    <div class="fab-main" onclick="openSheet()"><span class="material-icons-round" style="font-size:32px;">add</span></div>
 
     <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
     <div class="sheet" id="sheet-panel">
         <h3 style="margin-top:0;">新增項目</h3>
         <div class="type-row">
-            <div class="type-btn active" onclick="setType('spot', this)">📍 景點</div>
-            <div class="type-btn" onclick="setType('booking', this)">🎫 憑證/訂位</div>
+            <div class="type-btn active" onclick="setType('spot', this)">📍 行程</div>
+            <div class="type-btn" onclick="setType('ticket', this)">🎫 憑證</div>
             <div class="type-btn" onclick="setType('exp', this)">💰 記帳</div>
         </div>
 
-        <div id="form-spot" class="form-group">
+        <div id="form-spot">
             <select id="inp-day" class="inp"></select>
             <input type="time" id="inp-time" class="inp" value="10:00">
-            <input type="text" id="inp-title" class="inp" placeholder="地點名稱">
-            <input type="text" id="inp-desc" class="inp" placeholder="備註">
+            <input type="text" id="inp-title" class="inp" placeholder="地點 / 標題">
+            <textarea id="inp-desc" class="inp" rows="3" placeholder="介紹 / 攻略 / 筆記"></textarea>
         </div>
 
-        <div id="form-booking" class="form-group hidden">
-            <input type="text" id="bk-title" class="inp" placeholder="標題 (例: 飯店、餐廳)">
-            <input type="text" id="bk-date" class="inp" placeholder="日期 (例: 9/13)">
-            <input type="text" id="bk-code" class="inp" placeholder="訂位代碼 / 確認號">
-            <input type="text" id="bk-link" class="inp" placeholder="連結網址 (選填)">
-            <textarea id="bk-note" class="inp" rows="2" placeholder="備註 (選填)"></textarea>
+        <div id="form-ticket" class="hidden">
+            <input type="text" id="tk-title" class="inp" placeholder="標題 (例: 飯店名稱)">
+            <input type="text" id="tk-code" class="inp" placeholder="訂位代碼 / 確認號">
+            <input type="text" id="tk-link" class="inp" placeholder="連結網址 (http...)">
+            <input type="text" id="tk-note" class="inp" placeholder="備註 (例: Day 1 入住)">
         </div>
 
-        <div id="form-exp" class="form-group hidden">
-            <input type="number" id="exp-amt" class="inp" placeholder="金額 (JPY)">
-            <input type="text" id="exp-item" class="inp" placeholder="消費項目">
+        <div id="form-exp" class="hidden">
+            <input type="number" id="exp-amt" class="inp" placeholder="金額 (JPY)" oninput="calcRate()">
+            <div style="text-align:right; color:#888; font-size:0.8rem; margin-bottom:10px;">約台幣 <span id="twd-preview" style="color:var(--text-main); font-weight:bold;">0</span></div>
+            <input type="text" id="exp-item" class="inp" placeholder="項目">
+            <div class="filter-row" style="justify-content:flex-start;">
+                <div class="filter-btn" onclick="setPayer('Y', this)">Y</div>
+                <div class="filter-btn" onclick="setPayer('O', this)">O</div>
+                <div class="filter-btn" onclick="setPayer('E', this)">E</div>
+                <div class="filter-btn" onclick="setPayer('S', this)">S</div>
+            </div>
         </div>
 
         <button class="btn-main" onclick="saveItem()">儲存</button>
+    </div>
+
+    <div class="detail-modal" id="detail-modal">
+        <div class="detail-sheet">
+            <div class="dt-close" onclick="closeDetail()"><span class="material-icons-round" style="font-size:24px;">close</span></div>
+            <div class="dt-cover" onclick="closeDetail()">
+                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#999; font-size:30px;">PHOTO</div>
+            </div>
+            <div class="dt-content">
+                <div class="dt-label" id="dt-label">SPOT</div>
+                <div class="dt-title" id="dt-title">標題</div>
+                <div class="dt-desc" id="dt-desc">介紹...</div>
+                <button class="ask-btn" onclick="askAI()">
+                    <span class="material-icons-round" style="vertical-align:middle; color:#6c5ce7;">smart_toy</span> 詢問 AI 導遊
+                </button>
+                <div id="ai-res" style="margin-top:15px; line-height:1.6; font-size:0.9rem; color:#555; white-space: pre-wrap;"></div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -336,20 +428,25 @@
 
     let currentDay = 1;
     let currentType = 'spot';
+    let selectedPayer = 'Y';
+    const rate = 0.22;
+    // 儲存資料供 AI 讀取
+    let allSchedule = [];
+    let allExpenses = [];
 
     init();
 
     function init() {
-        const dateList = document.getElementById('date-list');
-        const daySel = document.getElementById('inp-day');
+        const dList = document.getElementById('date-list');
+        const dSel = document.getElementById('inp-day');
         for(let i=1; i<=10; i++) {
-            dateList.innerHTML += `<div class="date-item ${i===1?'active':''}" onclick="setDay(${i}, this)">
-                <span class="date-day">DAY</span><span class="date-num">${i}</span>
-            </div>`;
-            daySel.innerHTML += `<option value="${i}">Day ${i}</option>`;
+            dList.innerHTML += `<div class="date-item ${i===1?'active':''}" onclick="setDay(${i}, this)"><span class="date-day">DAY</span><span class="date-num">${i}</span></div>`;
+            dSel.innerHTML += `<option value="${i}">Day ${i}</option>`;
         }
         loadData();
         loadWeather();
+        const firstPayer = document.querySelector('#form-exp .filter-btn');
+        if(firstPayer) firstPayer.classList.add('active');
     }
 
     async function loadWeather() {
@@ -358,97 +455,112 @@
             const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&hourly=weathercode,temperature_2m&timezone=Asia%2FTokyo&forecast_days=1');
             const data = await res.json();
             box.innerHTML = '';
-            for(let i=9; i<21; i+=3) { // 顯示白天的天氣
+            for(let i=8; i<=20; i+=3) {
                 const t = data.hourly.time[i].split('T')[1];
                 const temp = Math.round(data.hourly.temperature_2m[i]);
                 const code = data.hourly.weathercode[i];
-                let icon = code<=3 ? '☀️' : (code<=48 ? '☁️' : '🌧️');
+                const icon = code<=3 ? '☀️' : (code<=48 ? '☁️' : '🌧️');
                 box.innerHTML += `<div class="w-item"><div class="w-time">${t}</div><div class="w-icon">${icon}</div><div class="w-temp">${temp}°</div></div>`;
             }
-        } catch(e) { box.innerHTML = '<span style="padding:10px; color:#999;">天氣載入失敗</span>'; }
+        } catch(e){ box.innerHTML='<div style="padding:10px; color:#ccc;">天氣載入失敗</div>'; }
     }
 
     function setDay(d, el) {
         currentDay = d;
         document.querySelectorAll('.date-item').forEach(e=>e.classList.remove('active'));
         el.classList.add('active');
-        loadData();
+        renderSchedule();
     }
 
     function loadData() {
-        // 1. 行程
+        // 行程
         db.ref('schedule').on('value', snap => {
-            const list = document.getElementById('itinerary-list');
-            list.innerHTML = '';
             const data = snap.val();
+            allSchedule = [];
             if(data) {
-                let arr = [];
-                for(let k in data) arr.push({id:k, ...data[k]});
-                arr.sort((a,b) => a.time.localeCompare(b.time));
-                arr.forEach(item => {
-                    if(item.day == currentDay) {
-                        list.innerHTML += `
-                        <div class="card">
-                            <div class="card-time">${item.time}</div>
-                            <div class="card-title">${item.title}</div>
-                            <div class="card-sub">${item.desc || ''}</div>
-                            <span onclick="delItem('schedule','${item.id}')" style="position:absolute; top:15px; right:15px; color:#ffadad; cursor:pointer;">×</span>
-                        </div>`;
-                    }
-                });
+                for(let k in data) allSchedule.push({id:k, ...data[k]});
+                renderSchedule();
             }
         });
 
-        // 2. 憑證 (Bookings) - 獨立路徑
-        db.ref('bookings').on('value', snap => {
+        // 憑證
+        db.ref('tickets').on('value', snap => {
             const list = document.getElementById('booking-list');
             list.innerHTML = '';
             const data = snap.val();
             if(data) {
-                Object.entries(data).forEach(([key, item]) => {
-                    let linkHtml = item.link ? `<a href="${item.link}" target="_blank" class="bk-btn">開啟連結</a>` : '';
+                Object.entries(data).forEach(([k, item]) => {
+                    const link = item.link ? `<a href="${item.link}" target="_blank" class="btn-link">開啟連結</a>` : '';
                     list.innerHTML += `
-                    <div class="booking-card">
-                        <div class="bk-header">
-                            <span class="bk-date">${item.date}</span>
-                            <span class="btn-del" onclick="delItem('bookings','${key}')"><span class="material-icons-round">delete</span></span>
-                        </div>
+                    <div class="bk-card">
+                        <div class="bk-header"><span>${item.note || 'TICKET'}</span><span class="btn-del" onclick="delItem('tickets','${k}')"><span class="material-icons-round" style="font-size:18px;">delete</span></span></div>
                         <div class="bk-body">
                             <div class="bk-title">${item.title}</div>
-                            <div class="bk-code-row">
-                                <span class="bk-code-label">確認代碼 / 備註</span>
-                                <div class="bk-code">${item.code || item.note || '--'}</div>
-                            </div>
+                            <span class="bk-code-label">CODE</span>
+                            <div class="bk-code">${item.code}</div>
                         </div>
-                        <div class="bk-actions">
-                            ${linkHtml}
-                        </div>
+                        <div class="bk-actions">${link}</div>
                     </div>`;
                 });
-            } else {
-                list.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">尚無憑證，請按 + 新增</div>';
-            }
+            } else { list.innerHTML='<div style="text-align:center; padding:30px; color:#ccc;">尚無憑證，請按 + 新增</div>'; }
         });
 
-        // 3. 記帳
+        loadWallet();
+    }
+
+    function renderSchedule() {
+        const list = document.getElementById('itinerary-list');
+        list.innerHTML = '';
+        // 過濾當天並排序
+        let dayItems = allSchedule.filter(i => i.day == currentDay);
+        dayItems.sort((a,b) => a.time.localeCompare(b.time));
+
+        if(dayItems.length === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:30px; color:#ccc;">本日無行程，請按 + 新增</div>';
+            return;
+        }
+
+        dayItems.forEach(item => {
+            list.innerHTML += `
+            <div class="card" onclick='openDetail(${JSON.stringify(item)})'>
+                <div class="card-time">${item.time}</div>
+                <div class="card-title">${item.title}</div>
+                <div class="card-sub"><span class="material-icons-round" style="font-size:14px;">notes</span> ${item.desc?item.desc.substring(0,15)+'...':'點擊查看詳情'}</div>
+                <span onclick="delItem('schedule','${item.id}')" style="position:absolute; top:15px; right:15px; color:#ffadad; padding:5px; cursor:pointer; z-index:10;">×</span>
+            </div>`;
+        });
+    }
+
+    function loadWallet(filter = 'ALL') {
         db.ref('expenses').on('value', snap => {
             const list = document.getElementById('wallet-list');
             list.innerHTML = ''; let total = 0;
             const data = snap.val();
+            allExpenses = []; // 存起來給 AI 用
             if(data) {
                 Object.values(data).forEach(ex => {
+                    allExpenses.push(ex);
+                    if(filter !== 'ALL' && ex.payer !== filter) return;
                     const twd = Math.round(ex.amount * 0.22);
                     total += twd;
-                    list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid #eee;"><span>${ex.item}</span><span style="font-weight:700;">$${twd}</span></div>`;
+                    list.innerHTML += `<div class="exp-item"><div>${ex.item}</div><div><span style="font-weight:700;">$${twd.toLocaleString()}</span> <span style="font-size:0.7rem; background:#eee; padding:2px 5px; border-radius:4px;">${ex.payer}</span></div></div>`;
                 });
             }
             document.getElementById('wallet-total').innerText = '$'+total.toLocaleString();
         });
     }
 
-    function delItem(path, id) { if(confirm('確定刪除?')) db.ref(path+'/'+id).remove(); }
+    function filterWallet(who, el) {
+        el.parentElement.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        el.classList.add('active');
+        loadWallet(who);
+    }
 
-    // --- UI 控制 ---
+    function delItem(path, id) { 
+        event.stopPropagation();
+        if(confirm('刪除?')) db.ref(path+'/'+id).remove(); 
+    }
+
     function switchView(id, el) {
         document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -456,77 +568,134 @@
         el.classList.add('active');
     }
     
-    function openSheet() { 
-        // 如果當前在憑證頁，預設選 Booking
-        if(document.getElementById('view-booking').classList.contains('active')) {
-            const bookingBtn = document.querySelectorAll('.type-btn')[1]; // 假設是第二個
-            setType('booking', bookingBtn);
-        }
-        document.getElementById('sheet-overlay').classList.add('show'); 
-        document.getElementById('sheet-panel').classList.add('show'); 
-    }
+    function openSheet() { document.getElementById('sheet-overlay').classList.add('show'); document.getElementById('sheet-panel').classList.add('show'); }
     function closeSheet() { document.getElementById('sheet-overlay').classList.remove('show'); document.getElementById('sheet-panel').classList.remove('show'); }
-
+    
     function setType(t, el) {
         currentType = t;
         document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
-        if(el) el.classList.add('active');
-        
-        // 隱藏所有表單
+        el.classList.add('active');
         document.getElementById('form-spot').classList.add('hidden');
-        document.getElementById('form-booking').classList.add('hidden');
+        document.getElementById('form-ticket').classList.add('hidden');
         document.getElementById('form-exp').classList.add('hidden');
+        if(t==='spot') document.getElementById('form-spot').classList.remove('hidden');
+        if(t==='ticket') document.getElementById('form-ticket').classList.remove('hidden');
+        if(t==='exp') document.getElementById('form-exp').classList.remove('hidden');
+    }
 
-        // 顯示對應表單
-        if(t === 'booking') document.getElementById('form-booking').classList.remove('hidden');
-        else if(t === 'exp') document.getElementById('form-exp').classList.remove('hidden');
-        else document.getElementById('form-spot').classList.remove('hidden');
+    function setPayer(p, el) { 
+        selectedPayer = p; 
+        el.parentElement.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function calcRate() { 
+        const val = document.getElementById('exp-amt').value;
+        const twd = Math.round(val * 0.22);
+        document.getElementById('twd-preview').innerText = twd.toLocaleString(); 
     }
 
     function saveItem() {
-        if(currentType === 'booking') {
-            const title = document.getElementById('bk-title').value;
-            if(!title) return alert('請輸入標題');
-            db.ref('bookings').push({
-                title: title,
-                date: document.getElementById('bk-date').value,
-                code: document.getElementById('bk-code').value,
-                link: document.getElementById('bk-link').value,
-                note: document.getElementById('bk-note').value
-            });
-        } else if(currentType === 'exp') {
-            db.ref('expenses').push({
-                amount: document.getElementById('exp-amt').value,
-                item: document.getElementById('exp-item').value
-            });
-        } else {
+        if(currentType === 'spot') {
             db.ref('schedule').push({
                 day: document.getElementById('inp-day').value,
                 time: document.getElementById('inp-time').value,
                 title: document.getElementById('inp-title').value,
-                desc: document.getElementById('inp-desc').value,
-                type: currentType
+                desc: document.getElementById('inp-desc').value
+            });
+        } else if(currentType === 'ticket') {
+            db.ref('tickets').push({
+                title: document.getElementById('tk-title').value,
+                code: document.getElementById('tk-code').value,
+                link: document.getElementById('tk-link').value,
+                note: document.getElementById('tk-note').value
+            });
+        } else {
+            db.ref('expenses').push({
+                amount: document.getElementById('exp-amt').value,
+                item: document.getElementById('exp-item').value,
+                payer: selectedPayer
             });
         }
         closeSheet();
-        // 清空 (略)
     }
 
-    // AI
+    // 詳情 & AI (Smart)
+    function openDetail(item) {
+        document.getElementById('dt-title').innerText = item.title;
+        document.getElementById('dt-desc').innerText = item.desc || '無介紹';
+        document.getElementById('detail-modal').classList.add('show');
+        document.getElementById('ai-res').innerText = '';
+    }
+    function closeDetail() { document.getElementById('detail-modal').classList.remove('show'); }
+    
+    // 智慧型 AI 回覆 (資料庫邏輯)
+    function askAI() {
+        const title = document.getElementById('dt-title').innerText;
+        const resBox = document.getElementById('ai-res');
+        resBox.innerHTML = '<span style="color:#6c5ce7">AI 正在分析...</span>';
+
+        setTimeout(() => {
+            let content = "";
+            if(title.includes("迪士尼")) {
+                content = "【攻略】東京迪士尼建議提早一小時入園，下載官方 App 抽取快速通關(DPA)。必吃：三眼怪麻糬、火雞腿。";
+            } else if(title.includes("塔") || title.includes("晴空")) {
+                content = "【景色】這是東京的知名地標！建議黃昏時段前往，可以同時看到日景與夜景。";
+            } else if(title.includes("寺") || title.includes("神宮")) {
+                content = "【參拜】參拜前請先在手水舍洗手。投幣建議投 5 円 (結緣)。";
+            } else if(title.includes("燒肉") || title.includes("壽司") || title.includes("拉麵")) {
+                content = "【美食】這家店在網路上評價不錯！建議避開用餐尖峰時段，或者提早預約。";
+            } else {
+                content = `【AI 導遊分析：${title}】\n這是一個值得一去的地方！建議您出發前確認營業時間。\n根據大數據顯示，這裡在下午 2 點左右人潮較多。`;
+            }
+            resBox.innerHTML = content;
+        }, 800);
+    }
+
     function toggleAI(show) { 
         const el = document.getElementById('ai-modal');
         if(show) el.classList.add('show'); else el.classList.remove('show');
     }
+    
+    // 真·邏輯 AI
     function sendAI() {
         const inp = document.getElementById('ai-input');
         const box = document.getElementById('chat-history');
-        if(!inp.value) return;
-        box.innerHTML += `<div class="msg user">${inp.value}</div>`;
-        setTimeout(()=>{
-            box.innerHTML += `<div class="msg ai">這個問題我也想知道！(模擬回覆)</div>`;
+        const txt = inp.value.trim();
+        if(!txt) return;
+
+        // User
+        box.innerHTML += `<div class="msg user">${txt}</div>`;
+        inp.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        // Smart Logic
+        setTimeout(() => {
+            let reply = "這個問題...我還需要學習！😅";
+            
+            // 1. 查行程
+            if(txt.includes("去哪") || txt.includes("行程")) {
+                let dayMatch = txt.match(/\d+/); // 找數字
+                let targetDay = dayMatch ? dayMatch[0] : currentDay;
+                let dayItems = allSchedule.filter(i => i.day == targetDay).map(i => i.title);
+                reply = dayItems.length > 0 ? `Day ${targetDay} 的行程有：${dayItems.join('、')}。` : `Day ${targetDay} 目前沒有行程喔！`;
+            }
+            // 2. 查錢包
+            else if(txt.includes("多少錢") || txt.includes("花") || txt.includes("預算")) {
+                let total = allExpenses.reduce((sum, ex) => sum + Math.round(ex.amount * 0.22), 0);
+                reply = `目前總共支出了約 TWD ${total.toLocaleString()} 元。`;
+            }
+            // 3. 基本問答
+            else if(txt.includes("你好")) reply = "你好！我是你的東京專屬導遊，準備好出發了嗎？✈️";
+            else if(txt.includes("天氣")) reply = "9月的東京氣溫約 23-28°C，早晚微涼，建議帶件薄外套喔！☔";
+            else if(txt.includes("交通") || txt.includes("地鐵")) reply = "東京地鐵很發達！強烈建議綁定 Suica (西瓜卡) 在手機，進出站最方便。迷路請看 Google Maps！";
+            else if(txt.includes("吃") || txt.includes("美食")) reply = "想吃什麼呢？\n1. 壽司：推薦築地/豐洲市場\n2. 拉麵：阿夫利(Afuri)、一蘭\n3. 燒肉：敘敘苑";
+            else if(txt.includes("買") || txt.includes("伴手禮")) reply = "必買推薦：NewYork Perfect Cheese、東京香蕉、Press Butter Sand。";
+            else if(txt.includes("救命") || txt.includes("緊急")) reply = "別慌！\n警察局：110\n火警/救護車：119\n外交部緊急聯絡：080-1009-7179";
+
+            box.innerHTML += `<div class="msg ai">${reply}</div>`;
             box.scrollTop = box.scrollHeight;
-        }, 800);
-        inp.value='';
+        }, 600);
     }
 
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
