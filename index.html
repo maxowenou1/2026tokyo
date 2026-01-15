@@ -34,13 +34,13 @@
             color: var(--text-main);
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            display: flex; justify-content: center; /* 電腦版置中 */
+            display: flex; justify-content: center;
             min-height: 100vh;
         }
 
-        /* --- 手機模擬容器 (關鍵！讓電腦看也像手機) --- */
+        /* --- 手機模擬容器 --- */
         #app-container {
-            width: 100%; max-width: 430px; /* 鎖定手機寬度 */
+            width: 100%; max-width: 430px;
             background-color: var(--bg);
             min-height: 100vh;
             position: relative;
@@ -58,7 +58,7 @@
         .trip-title { font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; }
         .trip-year { font-size: 0.75rem; border: 1px solid #ccc; border-radius: 20px; padding: 2px 8px; display: inline-block; color: #888; margin-left: 5px; }
 
-        /* --- View 1: 行程表 (Day Scroll) --- */
+        /* --- View 1: 行程表 --- */
         .date-scroll {
             display: flex; gap: 10px; overflow-x: auto; padding: 10px 20px;
             scrollbar-width: none;
@@ -67,7 +67,7 @@
         .date-item {
             min-width: 50px; height: 65px; background: #fff; border-radius: 30px;
             border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: var(--shadow); transition: 0.2s;
+            box-shadow: var(--shadow); transition: 0.2s; cursor: pointer;
         }
         .date-item.active { background: var(--text-main); color: #fff; transform: translateY(-3px); }
         .date-day { font-size: 0.6rem; letter-spacing: 1px; margin-bottom: 2px; }
@@ -84,7 +84,7 @@
         .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
         .card-sub { font-size: 0.8rem; color: #999; display: flex; align-items: center; gap: 4px;}
 
-        /* --- View 2: 訂位憑證 (Booking) - 獨立功能 --- */
+        /* --- View 2: 憑證 --- */
         .booking-list { padding: 20px; }
         .booking-card {
             background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 20px;
@@ -99,7 +99,7 @@
         .bk-actions { padding: 15px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
         .icon-btn { color: #666; cursor: pointer; }
 
-        /* --- View 3: 資訊頁 (Info) - 復刻版 --- */
+        /* --- View 3: 資訊 --- */
         .map-preview {
             margin: 20px; height: 200px; background: #eee; border-radius: 12px; 
             position: relative; overflow: hidden; border: 1px solid #ddd;
@@ -109,13 +109,13 @@
             position: absolute; bottom: 15px; left: 15px; right: 15px;
             background: #fff; padding: 10px; text-align: center; border-radius: 8px;
             font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            color: var(--text-main); text-decoration: none; display: block;
+            color: var(--text-main); text-decoration: none; display: block; cursor: pointer;
         }
         
         .vjw-card {
             margin: 0 20px 20px; background: linear-gradient(135deg, #1a1a1a, #333);
             border-radius: 12px; padding: 25px; color: #fff; position: relative;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); cursor: pointer;
         }
         .vjw-tag { background: var(--red); font-size: 0.6rem; padding: 3px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
         .vjw-title { font-size: 1.4rem; font-weight: 700; font-family: 'Serif'; margin-bottom: 5px; }
@@ -130,11 +130,14 @@
         .hotline-card { margin: 0 20px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); position: relative; }
         .hotline-num { font-size: 1.6rem; font-weight: 700; color: #333; margin: 5px 0; font-family: 'Inter'; }
 
-        /* --- 導遊詳情頁 (Detail Modal) --- */
+        /* --- View 4: 錢包 --- */
+        #view-wallet { text-align: center; }
+
+        /* --- 詳情頁 (Detail Modal) --- */
         .detail-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 200; display: none;
-            justify-content: center; align-items: flex-end; /* 手機版從下面出來 */
+            background: rgba(0,0,0,0.6); z-index: 2000; display: none;
+            justify-content: center; align-items: flex-end;
         }
         .detail-modal.show { display: flex; }
         
@@ -149,7 +152,7 @@
         .detail-close { 
             position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; 
             background: rgba(0,0,0,0.5); border-radius: 50%; color: #fff; 
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10;
         }
         
         .detail-content { padding: 25px; }
@@ -157,7 +160,7 @@
         .detail-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 10px; line-height: 1.3; }
         .detail-info { font-size: 0.9rem; color: #666; margin-bottom: 20px; display: flex; gap: 15px; }
         
-        .story-box { border-left: 3px solid #eee; padding-left: 15px; margin-bottom: 30px; }
+        .story-box { border-left: 3px solid #eee; padding-left: 15px; margin-bottom: 30px; text-align: left; }
         .story-p { font-size: 1rem; line-height: 1.8; color: #444; margin-bottom: 15px; }
         .story-label { font-weight: 700; margin-bottom: 5px; font-size: 0.9rem; }
 
@@ -169,7 +172,7 @@
         }
         .ai-result { 
             background: #F0F4F8; padding: 15px; border-radius: 12px; margin-top: 15px; 
-            font-size: 0.9rem; line-height: 1.6; display: none; 
+            font-size: 0.9rem; line-height: 1.6; display: none; text-align: left;
         }
 
         /* --- 底部導航 --- */
@@ -192,17 +195,29 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 90;
         }
 
-        /* 新增面板 */
-        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; display: none; }
-        .sheet-overlay.show { display: flex; justify-content: center; align-items: flex-end; }
-        .sheet { width: 100%; max-width: 430px; background: #fff; border-radius: 20px 20px 0 0; padding: 25px; box-sizing: border-box; transform: translateY(100%); transition: 0.3s; padding-bottom: calc(30px + var(--safe-bottom)); }
+        /* --- 新增面板 (已修復 Z-INDEX) --- */
+        .sheet-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 2999; /* 很高 */
+            display: none; 
+        }
+        .sheet-overlay.show { display: block; }
+        
+        .sheet { 
+            width: 100%; max-width: 430px; background: #fff; 
+            border-radius: 20px 20px 0 0; padding: 25px; box-sizing: border-box; 
+            transform: translateY(100%); transition: 0.3s; 
+            padding-bottom: calc(30px + var(--safe-bottom));
+            position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; /* 確保置中 */
+            z-index: 3000; /* 最高！比 Overlay 高 */
+        }
         .sheet.show { transform: translateY(0); }
         
         .inp { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 12px; font-size: 1rem; box-sizing: border-box; background: #f9f9f9; }
-        .type-row { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; }
-        .type-btn { padding: 8px 16px; border: 1px solid #eee; border-radius: 20px; font-size: 0.9rem; white-space: nowrap; }
+        .type-row { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px;}
+        .type-btn { padding: 8px 16px; border: 1px solid #eee; border-radius: 20px; font-size: 0.9rem; white-space: nowrap; cursor: pointer; }
         .type-btn.active { background: var(--text-main); color: #fff; }
-        .btn-main { width: 100%; padding: 15px; background: var(--text-main); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; }
+        .btn-main { width: 100%; padding: 15px; background: var(--text-main); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
         .view { display: none; }
         .view.active { display: block; }
@@ -239,7 +254,7 @@
         </header>
         
         <div class="map-preview">
-            <img src="https://maps.googleapis.com/maps/api/staticmap?center=Tokyo&zoom=10&size=600x300&key=YOUR_KEY_OR_MOCK" class="map-img" style="background:#ddd;">
+            <div style="width:100%; height:100%; background:#eee; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:30px;">MAP</div>
             <a href="https://www.google.com/maps/place/Tokyo" target="_blank" class="map-btn">
                 <span class="material-icons-outlined" style="vertical-align:middle; font-size:18px;">map</span> 開啟 Google Maps 導航
             </a>
@@ -322,9 +337,7 @@
 
                 <div class="story-box">
                     <div class="story-label">【介紹與攻略】</div>
-                    <div class="story-p" id="dt-desc">
-                        這裡會顯示詳細的介紹。如果沒有填寫，AI 導遊可以幫你生成。
-                    </div>
+                    <div class="story-p" id="dt-desc">暫無詳細介紹。</div>
                     <div class="story-label" id="dt-code-label" style="display:none;">【訂位/代碼】</div>
                     <div class="story-p" id="dt-code" style="font-family:'Inter'; font-weight:700; font-size:1.2rem; display:none;"></div>
                 </div>
@@ -334,44 +347,42 @@
                     Ask AI Guide (詢問 AI 導遊)
                 </button>
                 <div class="ai-result" id="ai-result">
-                    正在分析此地點的資訊...<br>推薦菜色：...<br>注意事項：...
+                    正在分析...
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()">
-        <div class="sheet" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0;">新增項目</h3>
-            <div class="type-row">
-                <div class="type-btn active" onclick="setType('spot', this)">📍 景點</div>
-                <div class="type-btn" onclick="setType('food', this)">🍴 餐廳</div>
-                <div class="type-btn" onclick="setType('hotel', this)">🏨 住宿</div>
-                <div class="type-btn" onclick="setType('trans', this)">🚕 交通</div>
-                <div class="type-btn" onclick="setType('exp', this)">💰 記帳</div>
-            </div>
-
-            <div id="form-common">
-                <select id="inp-day" class="inp"></select>
-                <input type="time" id="inp-time" class="inp" value="10:00">
-                <input type="text" id="inp-title" class="inp" placeholder="名稱">
-                <textarea id="inp-desc" class="inp" rows="3" placeholder="介紹 / 攻略 / 筆記 (會顯示在導遊頁)"></textarea>
-                <input type="text" id="inp-code" class="inp" placeholder="訂位代碼 / 確認號 (會顯示在憑證區)">
-            </div>
-
-            <div id="form-exp" style="display:none;">
-                <input type="number" id="inp-amt" class="inp" placeholder="金額 (JPY)">
-                <input type="text" id="inp-item" class="inp" placeholder="項目">
-            </div>
-
-            <button class="btn-main" onclick="saveItem()">儲存</button>
+    <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
+    <div class="sheet" id="sheet-panel">
+        <h3 style="margin-top:0;">新增項目</h3>
+        <div class="type-row">
+            <div class="type-btn active" onclick="setType('spot', this)">📍 景點</div>
+            <div class="type-btn" onclick="setType('food', this)">🍴 餐廳</div>
+            <div class="type-btn" onclick="setType('hotel', this)">🏨 住宿</div>
+            <div class="type-btn" onclick="setType('trans', this)">🚕 交通</div>
+            <div class="type-btn" onclick="setType('exp', this)">💰 記帳</div>
         </div>
+
+        <div id="form-common">
+            <select id="inp-day" class="inp"></select>
+            <input type="time" id="inp-time" class="inp" value="10:00">
+            <input type="text" id="inp-title" class="inp" placeholder="名稱">
+            <textarea id="inp-desc" class="inp" rows="3" placeholder="介紹 / 攻略 / 筆記 (會顯示在導遊頁)"></textarea>
+            <input type="text" id="inp-code" class="inp" placeholder="訂位代碼 / 確認號 (會顯示在憑證區)">
+        </div>
+
+        <div id="form-exp" style="display:none;">
+            <input type="number" id="inp-amt" class="inp" placeholder="金額 (JPY)">
+            <input type="text" id="inp-item" class="inp" placeholder="項目">
+        </div>
+
+        <button class="btn-main" onclick="saveItem()">儲存</button>
     </div>
 
 </div>
 
 <script>
-    // ✅ 金鑰
     const firebaseConfig = {
         apiKey: "AIzaSyCbrzyXFiRYxGyt6crsRTQNQ5lfZnz65kA",
         authDomain: "tokyo-trip-2026-acfe6.firebaseapp.com",
@@ -391,7 +402,6 @@
     init();
 
     function init() {
-        // 生成 10 天
         const dateList = document.getElementById('date-list');
         const daySel = document.getElementById('inp-day');
         for(let i=1; i<=10; i++) {
@@ -411,7 +421,6 @@
     }
 
     function loadData() {
-        // 1. 載入行程
         db.ref('schedule').on('value', snap => {
             const list = document.getElementById('itinerary-list');
             const bkList = document.getElementById('booking-list');
@@ -424,7 +433,7 @@
                 arr.sort((a,b) => a.time.localeCompare(b.time));
 
                 arr.forEach(item => {
-                    // A. 行程卡片 (只顯示在該天)
+                    // 行程卡
                     if(item.day == currentDay) {
                         list.innerHTML += `
                         <div class="card" onclick='openDetail(${JSON.stringify(item)})'>
@@ -436,8 +445,7 @@
                             </div>
                         </div>`;
                     }
-
-                    // B. 憑證卡片 (顯示在憑證區，如果有代碼)
+                    // 憑證卡
                     if(item.code) {
                         bkList.innerHTML += `
                         <div class="booking-card">
@@ -451,7 +459,7 @@
                                 <div class="bk-code">${item.code}</div>
                             </div>
                             <div class="bk-actions">
-                                <span class="material-icons-outlined icon-btn">content_copy</span>
+                                <span class="material-icons-outlined icon-btn" style="font-size:18px;">content_copy</span>
                             </div>
                         </div>`;
                     }
@@ -459,7 +467,6 @@
             }
         });
 
-        // 2. 載入記帳
         db.ref('expenses').on('value', snap => {
             const list = document.getElementById('wallet-list');
             list.innerHTML = ''; let total = 0;
@@ -478,12 +485,11 @@
         });
     }
 
-    // --- 詳情與 AI ---
     function openDetail(item) {
         document.getElementById('dt-tag').innerText = item.type;
         document.getElementById('dt-title').innerText = item.title;
         document.getElementById('dt-time').innerText = item.time;
-        document.getElementById('dt-desc').innerText = item.desc || "暫無詳細介紹，點擊下方按鈕詢問 AI。";
+        document.getElementById('dt-desc').innerText = item.desc || "暫無詳細介紹。";
         
         if(item.code) {
             document.getElementById('dt-code-label').style.display='block';
@@ -502,27 +508,26 @@
     function askAI() {
         const res = document.getElementById('ai-result');
         res.style.display = 'block';
-        res.innerHTML = 'AI 正在查詢資料庫...';
+        res.innerHTML = 'AI 正在分析...';
         setTimeout(() => {
-            res.innerHTML = `
-            <strong>【AI 導遊分析】</strong><br>
-            這是一個非常棒的選擇！<br>
-            ★ <strong>必吃/亮點：</strong> 網友推薦這裡的特色體驗。<br>
-            ★ <strong>小提醒：</strong> 建議提前 10 分鐘抵達。<br>
-            祝您在 ${document.getElementById('dt-title').innerText} 玩得愉快！
-            `;
+            res.innerHTML = `<strong>【AI 導遊】</strong><br>這是一個很棒的地方！<br>推薦您注意...`;
         }, 1000);
     }
 
-    // --- 操作 ---
     function switchView(id, el) {
         document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
         el.classList.add('active');
     }
-    function openSheet() { document.getElementById('sheet-overlay').classList.add('show'); document.getElementById('sheet-overlay').style.display='flex'; }
-    function closeSheet() { document.getElementById('sheet-overlay').classList.remove('show'); setTimeout(()=>document.getElementById('sheet-overlay').style.display='none', 300);}
+    function openSheet() { 
+        document.getElementById('sheet-overlay').classList.add('show'); 
+        document.getElementById('sheet-panel').classList.add('show'); 
+    }
+    function closeSheet() { 
+        document.getElementById('sheet-overlay').classList.remove('show'); 
+        document.getElementById('sheet-panel').classList.remove('show'); 
+    }
     
     function setType(t, el) {
         currentType = t;
